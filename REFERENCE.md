@@ -22,9 +22,15 @@ For example:
     $merged_hash = deeper_merge($hash1, $hash2)
     # The resulting hash is equivalent to:
     # $merged_hash = { 'one' => 1, 'two' => 'dos', 'three' => { 'four' => 4, 'five' => 5 } }
+    $hash1 = { 'key1' => [ 'arrayvalue1', 'arrayvalue2' ] }
+    $hash2 = { 'key1' => [ 'arrayvalue2', 'arrayvalue3' ] }
+    $merged_hash = deeper_merge($hash1, $hash2)
+    # The resulting hash is equivalent to:
+    # $merged_hash = { key1' => [ 'arrayvalue1', 'arrayvalue2', 'arrayvalue3' ] }
 
 When there is a duplicate key that is a hash, they are recursively merged.
-When there is a duplicate key that is not a hash, the key in the rightmost hash will "win
+When there is a duplicate key that is an array, they are recursively merged with duplicates removed.
+When there is a duplicate key that is not a hash or an array, the key in the rightmost hash will "win
 
 #### `deeper_merge()`
 
@@ -37,9 +43,15 @@ For example:
     $merged_hash = deeper_merge($hash1, $hash2)
     # The resulting hash is equivalent to:
     # $merged_hash = { 'one' => 1, 'two' => 'dos', 'three' => { 'four' => 4, 'five' => 5 } }
+    $hash1 = { 'key1' => [ 'arrayvalue1', 'arrayvalue2' ] }
+    $hash2 = { 'key1' => [ 'arrayvalue2', 'arrayvalue3' ] }
+    $merged_hash = deeper_merge($hash1, $hash2)
+    # The resulting hash is equivalent to:
+    # $merged_hash = { key1' => [ 'arrayvalue1', 'arrayvalue2', 'arrayvalue3' ] }
 
 When there is a duplicate key that is a hash, they are recursively merged.
-When there is a duplicate key that is not a hash, the key in the rightmost hash will "win
+When there is a duplicate key that is an array, they are recursively merged with duplicates removed.
+When there is a duplicate key that is not a hash or an array, the key in the rightmost hash will "win
 
 Returns: `Any`
 

@@ -43,6 +43,27 @@ describe 'deeper_merge' do
     }
   end
 
+  describe 'when arguments have subarrays' do
+    # merge different keys containing subarrays
+    it {
+      is_expected.to run \
+        .with_params({ 'key1' => 'value1' }, 'key2' => ['arrayvalue2'], 'key3' => ['arrayvalue3', 'arrayvalue4']) \
+        .and_return('key1' => 'value1', 'key2' => ['arrayvalue2'], 'key3' => ['arrayvalue3', 'arrayvalue4'])
+    }
+    # merge duplicate keys containing subarrays with unique values
+    it {
+      is_expected.to run \
+        .with_params({ 'key1' => ['arrayvalue1'] }, { 'key1' => ['arrayvalue2', 'arrayvalue3'] }, { 'key2' => ['arrayvalue4'] }, 'key2' => ['arrayvalue5']) \
+        .and_return('key1' => ['arrayvalue1', 'arrayvalue2', 'arrayvalue3'], 'key2' => ['arrayvalue4', 'arrayvalue5'])
+    }
+    # merge duplicate keys containing subarrays with duplicate values which get removed
+    it {
+      is_expected.to run \
+        .with_params({ 'key1' => ['arrayvalue1', 'arrayvalue2'] }, 'key1' => ['arrayvalue2', 'arrayvalue3']) \
+        .and_return('key1' => ['arrayvalue1', 'arrayvalue2', 'arrayvalue3'])
+    }
+  end
+
   arguments = { 'key1' => 'value1' }, { 'key2' => 'value2' }
   originals = [arguments[0].dup, arguments[1].dup]
   it 'does not change the original hashes' do
