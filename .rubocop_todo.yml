@@ -1,0 +1,5 @@
+RSpec/NamedSubject:
+  Enabled: false
+Style/HashSyntax:
+  Exclude:
+  - lib/puppet/parser/functions/deeper_merge.rb
