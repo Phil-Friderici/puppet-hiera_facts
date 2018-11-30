@@ -6,6 +6,7 @@
 **Functions**
 
 * [`deeper_merge`](#deeper_merge): Recursively merges two or more hashes together and returns the resulting hash.  For example:      $hash1 = {'one' => 1, 'two' => 2, 'three' =
+* [`hiera_facts::facts_backend`](#hiera_factsfacts_backend): 
 
 ## Functions
 
@@ -54,4 +55,28 @@ When there is a duplicate key that is an array, they are recursively merged with
 When there is a duplicate key that is not a hash or an array, the key in the rightmost hash will "win
 
 Returns: `Any`
+
+### hiera_facts::facts_backend
+
+Type: Puppet Language
+
+The hiera_facts::facts_backend function.
+
+#### `hiera_facts::facts_backend(Hash $options, Puppet::LookupContext $context)`
+
+The hiera_facts::facts_backend function.
+
+Returns: `Hash[RichDataKey, RichData]` Returns a hash that contains all collected hiera data for the given configuration.
+
+##### `options`
+
+Data type: `Hash`
+
+Configure fact(s) and path(s) details to be used by the backend.
+
+##### `context`
+
+Data type: `Puppet::LookupContext`
+
+We ignore this argument, it is mandatory for a function to accept it.
 

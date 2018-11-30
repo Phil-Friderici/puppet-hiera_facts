@@ -1,88 +1,95 @@
 
 # hiera_facts
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
+Hiera 5 backend to include data from hierarchies triggerd by facts.
 
 #### Table of Contents
 
 1. [Description](#description)
 2. [Setup - The basics of getting started with hiera_facts](#setup)
-    * [What hiera_facts affects](#what-hiera_facts-affects)
     * [Setup requirements](#setup-requirements)
     * [Beginning with hiera_facts](#beginning-with-hiera_facts)
+    * [Example](#example)
 3. [Usage - Configuration options and additional functionality](#usage)
 4. [Limitations - OS compatibility, etc.](#limitations)
-5. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module is what they want.
+This hiera backend allows to add hiera based configuration data triggered by
+client facts. You can choose which fact should trigger what hierachy levels.
+A fact can contain multiple triggers as array or comma separated values.
 
 ## Setup
 
-### What hiera_facts affects **OPTIONAL**
+### Setup Requirements
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
-
-If there's more that they should know about, though, this is the place to mention:
-
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+Hiera version 5 is required for this backend to work.
 
 ### Beginning with hiera_facts
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+Make sure this module repository is available to your Puppet masters,
+clients will not need to access this module.
+
+# Puppet Master Configuration
+
+All configuration is done in the hierachies hash in hiera.yaml.
+The backend is passive as there is no default configuration.
+
+To activate the backend, specify fact(s) and search path(s) to the options hash.
+To search through multiple hiera levels, add more paths as a nested hash.
+
+You need to restart the puppetserver service to activate changes in hiera.yaml.
+
+
+## Example
+
+# Create backend configuration on the Puppet master
+
+Add a configuration like this to your hierachy configuration in hiera.yaml:
+
+```yaml
+hierarchy:
+  - name: "hiera_facts"
+    data_hash: "hiera_facts::facts_backend"
+    options:
+        hierachies:
+          'profile_fact':
+            fact: 'profile_fact'
+            path: "/etc/puppetlabs/code/environments/%{environment}/hieradata/profiles"
+          'team_fact':
+            fact: 'team_fact'
+            path: "/etc/puppetlabs/code/environments/%{environment}/hieradata/team/%{team}/fact"
+
+```
+
+Restart the puppetserver service.
+
+Create or move your hiera files in the according directory structure.
+
+---
+
+# Specify Facts on the Puppet client
+
+Add a key / value pair to the external facts file containg the groups you want to apply.
+
+/etc/puppetlabs/facter/facts.d/example.txt:
+```
+profile_fact=base,net,webserver
+team_fact=webteam
+```
+
+Run puppet agent and smile ;)
+
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
-
-## Reference
-
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
+One use case for the backend is to act as a client controlled ENC.
+Use hiera to create roles and profiles like configurations and choose them
+directly by setting facts on the client itself. That creates an convenient way
+for non-Puppeteers to use Puppet by editing a simple text file on the client.
 
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
-
-## Development
-
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+You can use Puppet to rollout clients facts that will then trigger this backend.
+It will take two Puppet runs to get them active. The first will just rollout the
+facts to the client. The second run will finally start using them.

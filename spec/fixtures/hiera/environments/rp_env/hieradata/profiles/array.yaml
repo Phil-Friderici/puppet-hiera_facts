@@ -1,0 +1,4 @@
+---
+hiera_facts::usecases::content:
+  - 'profile-array_element1'
+  - 'profile-array_element2'
