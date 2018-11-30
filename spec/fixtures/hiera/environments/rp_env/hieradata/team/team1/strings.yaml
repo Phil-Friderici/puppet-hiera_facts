@@ -1,0 +1,3 @@
+---
+hiera_facts::usecases::path:    '/team1-strings'
+hiera_facts::usecases::content: 'team1-strings'

@@ -1,0 +1,5 @@
+---
+hiera_facts::usecases::path:    '/profile-array-duplicate'
+hiera_facts::usecases::content:
+  - 'profile-array-duplicate_element1'
+  - 'profile-array-duplicate_element2'
